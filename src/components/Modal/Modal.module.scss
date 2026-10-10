@@ -1,0 +1,47 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--backdrop);
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 51;
+  transform: translate(-50%, -50%);
+  width: min(580px, calc(100vw - 32px));
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border-radius: var(--r-modal);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-body);
+  color: var(--text);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-panel);
+  font-weight: 700;
+}
+
+.description {
+  margin: 2px 0 0;
+  font-size: var(--fs-sub);
+  color: var(--text-muted);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

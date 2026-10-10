@@ -2,14 +2,18 @@
   border: 1px solid var(--hairline);
   border-radius: var(--r-input);
   background: var(--card);
-  padding: 4px 8px;
+  max-width: 100%;
+  padding: 5px 8px;
   font: inherit;
   font-size: var(--fs-sub);
   color: var(--text);
   cursor: pointer;
 
+  &:hover {
+    background: var(--band);
+  }
+
   &:focus {
-    outline: none;
-    border-color: var(--green-accent);
+    outline: 2px solid var(--green-accent);
   }
 }

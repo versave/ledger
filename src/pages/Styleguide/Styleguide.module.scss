@@ -14,7 +14,8 @@
 // Element selectors are global in CSS modules, so scope token names to this page's blocks.
 .swatchMeta,
 .typeMeta,
-.radius {
+.tile,
+.demo {
   code {
     font-size: var(--fs-caption);
     color: var(--green-ink);
@@ -114,19 +115,19 @@
   font-weight: 600;
 }
 
-// Radii
-.radii {
+// Radii & shadows
+.tiles {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
-.radius {
+.tile {
   width: 130px;
   height: 84px;
   background: var(--card);
   border: 1px solid var(--hairline);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--r-card);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -135,20 +136,42 @@
 }
 
 // Component demos
-.demoRow {
-  padding: 18px 22px;
+.demos {
+  padding: 4px 22px;
+}
+
+.demo {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @include bp.small {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+.demoLabel {
+  font-size: var(--fs-sub);
+  color: var(--text-muted);
+}
+
+.demoBody {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
 
-.demoText {
+.w180 {
   width: 180px;
-}
-
-.demoAmount {
-  width: 130px;
 }
 
 .kpis {
@@ -159,4 +182,26 @@
   @include bp.small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+// 50/50 panel pair, equal heights
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: stretch;
+
+  @include bp.narrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.readText {
+  padding: 0 8px;
 }

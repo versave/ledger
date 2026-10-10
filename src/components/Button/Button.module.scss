@@ -31,6 +31,31 @@
   }
 }
 
+.primary {
+  border-color: var(--green-ink);
+  background: var(--green-ink);
+  color: #fff;
+
+  &:hover {
+    background: oklch(0.3 0.035 155);
+  }
+}
+
+.dashed {
+  border: 1px dashed var(--chart-2);
+  border-radius: var(--r-input);
+  padding: 5px 10px;
+  font-size: var(--fs-caption);
+  background: transparent;
+  color: var(--green-ink);
+  white-space: nowrap;
+
+  &:hover {
+    border-style: solid;
+    background: var(--brass-tint);
+  }
+}
+
 .active {
   background: var(--brass);
   border-color: var(--brass);

@@ -5,13 +5,17 @@
 .head {
   padding: 18px 22px 14px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
 .titles {
   min-width: 0;
+
+  > :first-child:not(.title) {
+    margin-bottom: 4px;
+  }
 }
 
 .title {
@@ -21,6 +25,7 @@
 }
 
 .sub {
+  margin-top: 2px;
   font-size: var(--fs-sub);
   color: var(--text-muted);
 }

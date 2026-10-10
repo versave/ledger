@@ -1,0 +1,16 @@
+.dot {
+  flex: none;
+  display: block;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--hairline);
+  cursor: default;
+
+  &:not(:disabled)[aria-haspopup],
+  &:not(:disabled)[aria-expanded] {
+    cursor: pointer;
+  }
+}

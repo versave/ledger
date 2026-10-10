@@ -1,0 +1,24 @@
+.scroller {
+  overflow-x: auto;
+  padding: 12px 22px 18px;
+  border-top: 1px solid var(--hairline);
+}
+
+.value {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.half {
+  font-size: var(--fs-caption);
+}
+
+.rule {
+  stroke: var(--hairline);
+}
+
+.year {
+  font-size: var(--fs-sub);
+  font-weight: 600;
+}

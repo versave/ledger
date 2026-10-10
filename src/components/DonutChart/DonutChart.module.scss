@@ -1,0 +1,111 @@
+.figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px 44px;
+  padding: 10px 26px 28px;
+  border-top: 1px solid var(--hairline);
+}
+
+.ring {
+  position: relative;
+  flex: none;
+  margin-top: 18px;
+
+  // Recharts' wrapper; keep the centre label from swallowing hover on the ring.
+  :global(.recharts-wrapper) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.center {
+  position: absolute;
+  inset: 16%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.centerValue {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.centerLabel {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+
+.legend {
+  flex: 1 1 280px;
+  min-width: 0;
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 20px 22px;
+}
+
+.item {
+  min-width: 0;
+}
+
+.itemLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--fs-body);
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.itemValue,
+.tooltipValue {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  span {
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+}
+
+.itemValue {
+  padding-left: 22px;
+}
+
+.tooltip {
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-btn);
+  box-shadow: var(--shadow-md);
+}
+
+.tooltipLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sub);
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

@@ -1,0 +1,30 @@
+.percentBar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.track {
+  flex: 1;
+  max-width: 64px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: var(--band);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+}
+
+.text {
+  min-width: 50px;
+  text-align: right;
+  font-size: var(--fs-sub);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}

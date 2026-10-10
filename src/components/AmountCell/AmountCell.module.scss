@@ -1,0 +1,36 @@
+.cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-width: 0;
+}
+
+.static {
+  display: block;
+  padding: 0 8px;
+  text-align: right;
+  font-size: var(--fs-cell);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.linkButton {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-input);
+  background: transparent;
+  color: var(--neutral-400);
+  cursor: pointer;
+
+  &:hover {
+    color: oklch(0.3 0.035 155);
+    background: var(--brass-tint);
+  }
+}
