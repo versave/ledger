@@ -1,0 +1,26 @@
+.input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-input);
+  background: transparent;
+  padding: 5px 8px;
+  font: inherit;
+  font-size: var(--fs-cell);
+  color: var(--text);
+
+  &:hover {
+    border-color: var(--hairline);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--green-accent);
+    background: var(--card);
+  }
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,21 @@
+@use '../../styles/breakpoints' as bp;
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+
+  @include bp.narrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.main {
+  grid-column: 2;
+  min-width: 0;
+  padding: 0 clamp(14px, 3vw, 36px) 56px;
+
+  @include bp.narrow {
+    grid-column: 1;
+  }
+}

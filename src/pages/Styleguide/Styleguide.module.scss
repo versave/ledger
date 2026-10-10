@@ -1,0 +1,162 @@
+@use '../../styles/breakpoints' as bp;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+// Element selectors are global in CSS modules, so scope token names to this page's blocks.
+.swatchMeta,
+.typeMeta,
+.radius {
+  code {
+    font-size: var(--fs-caption);
+    color: var(--green-ink);
+  }
+}
+
+// Colours
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  & + & {
+    margin-top: 10px;
+  }
+}
+
+.groupTitle {
+  font-size: var(--fs-cell);
+  font-weight: 600;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.chartSwatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+}
+
+.swatch {
+  overflow: hidden;
+}
+
+.chip,
+.chipSmall {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.chip {
+  height: 64px;
+}
+
+.chipSmall {
+  height: 40px;
+}
+
+.swatchMeta {
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-sub);
+}
+
+// Type
+.type {
+  padding: 4px 22px;
+}
+
+.typeRow {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @include bp.small {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+
+.typeMeta {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-sub);
+}
+
+.typeSample {
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.heading {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// Radii
+.radii {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.radius {
+  width: 130px;
+  height: 84px;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--fs-sub);
+}
+
+// Component demos
+.demoRow {
+  padding: 18px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.demoText {
+  width: 180px;
+}
+
+.demoAmount {
+  width: 130px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+
+  @include bp.small {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

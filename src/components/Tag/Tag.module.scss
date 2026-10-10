@@ -1,0 +1,19 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.brass {
+  background: var(--brass-light);
+  color: var(--green-deep);
+}
+
+.subtle {
+  background: var(--band);
+  color: var(--text-muted);
+}

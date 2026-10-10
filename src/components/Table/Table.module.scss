@@ -1,0 +1,60 @@
+.wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0 8px;
+    text-align: left;
+
+    &:first-child {
+      padding-left: 22px;
+    }
+
+    &:last-child {
+      padding-right: 22px;
+    }
+  }
+
+  thead th {
+    height: 38px;
+    background: var(--band);
+    border-block: 1px solid var(--hairline);
+    font-size: var(--fs-sub);
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  tbody {
+    td {
+      height: 54px;
+      border-bottom: 1px solid var(--hairline);
+      font-size: var(--fs-cell);
+    }
+
+    tr:hover {
+      background: var(--band);
+    }
+  }
+
+  tfoot td {
+    height: 46px;
+    background: var(--band);
+    font-size: var(--fs-cell);
+    font-weight: 700;
+  }
+
+  // Nested so they outrank the th/td defaults above.
+  .numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .muted {
+    color: var(--text-muted);
+  }
+}

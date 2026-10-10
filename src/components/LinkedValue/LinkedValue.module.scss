@@ -1,0 +1,38 @@
+.linked {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.clickable {
+  border: 1px solid transparent;
+  border-radius: var(--r-input);
+  background: transparent;
+  padding: 3px 8px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--hairline);
+  }
+}
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-cell);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+
+  svg {
+    color: var(--green-ink);
+  }
+}
+
+.source {
+  font-size: var(--fs-label);
+  color: var(--green-ink);
+}

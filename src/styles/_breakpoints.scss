@@ -1,0 +1,15 @@
+// Below this width the sidebar collapses into a top bar.
+$narrow: 979px;
+$small: 720px;
+
+@mixin narrow {
+  @media (max-width: $narrow) {
+    @content;
+  }
+}
+
+@mixin small {
+  @media (max-width: $small) {
+    @content;
+  }
+}

@@ -1,0 +1,37 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-btn);
+  padding: 7px 12px;
+  font: inherit;
+  font-size: var(--fs-sub);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--text);
+
+  svg {
+    flex: none;
+  }
+}
+
+.default:hover {
+  background: var(--band);
+}
+
+.toggle {
+  gap: 8px;
+  padding: 7px 14px;
+  color: var(--green-deep);
+
+  &:hover {
+    border-color: var(--green-deep);
+  }
+}
+
+.active {
+  background: var(--brass);
+  border-color: var(--brass);
+}

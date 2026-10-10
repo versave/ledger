@@ -1,0 +1,23 @@
+.kpi {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.value {
+  font-size: var(--fs-kpi);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.sub {
+  font-size: var(--fs-sub);
+  color: var(--text-muted);
+}

@@ -1,0 +1,33 @@
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-btn);
+  overflow: hidden;
+  background: var(--card);
+}
+
+.segment {
+  border: 0;
+  border-right: 1px solid var(--hairline);
+  padding: 7px 16px;
+  font: inherit;
+  font-size: var(--fs-sub);
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+
+  &:last-child {
+    border-right: 0;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
+.selected {
+  background: var(--brass-light);
+  color: var(--green-deep);
+}

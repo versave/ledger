@@ -1,0 +1,15 @@
+.select {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-input);
+  background: var(--card);
+  padding: 4px 8px;
+  font: inherit;
+  font-size: var(--fs-sub);
+  color: var(--text);
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--green-accent);
+  }
+}
