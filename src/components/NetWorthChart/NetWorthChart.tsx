@@ -102,6 +102,8 @@ export default function NetWorthChart({ points, currentId }: Props) {
             const top = Number(y)
             const offset = (BAR_W + HALF_GAP) / 2
             const color = row.current ? INK : MUTED
+            // Centre the year under whichever halves exist.
+            const ruleCenter = row.points.H1 && row.points.H2 ? cx : row.points.H1 ? cx - offset : cx + offset
             return (
               <g>
                 {(['H1', 'H2'] as const).map((h, i) => {
@@ -120,8 +122,14 @@ export default function NetWorthChart({ points, currentId }: Props) {
                     </text>
                   )
                 })}
-                <line x1={cx - BAR_W - HALF_GAP / 2} x2={cx + BAR_W + HALF_GAP / 2} y1={top + 18} y2={top + 18} className={styles.rule} />
-                <text x={cx} y={top + 38} textAnchor="middle" className={styles.year} style={{ fill: color }}>
+                <line
+                  x1={row.points.H1 ? cx - BAR_W - HALF_GAP / 2 : cx + HALF_GAP / 2}
+                  x2={row.points.H2 ? cx + BAR_W + HALF_GAP / 2 : cx - HALF_GAP / 2}
+                  y1={top + 18}
+                  y2={top + 18}
+                  className={styles.rule}
+                />
+                <text x={ruleCenter} y={top + 38} textAnchor="middle" className={styles.year} style={{ fill: color }}>
                   {row.year}
                 </text>
               </g>
