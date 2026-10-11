@@ -4,7 +4,7 @@
 CREATE TABLE income (
   id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
   name       TEXT NOT NULL DEFAULT '',
-  amount     INTEGER NOT NULL DEFAULT 0,                 -- amount in the frequency's unit, integer cents
+  amount     INTEGER NOT NULL DEFAULT 0,                 -- monthly amount, integer cents (yearly is ×12)
   currency   TEXT NOT NULL DEFAULT 'EUR',
   -- Values must match shared/enums.ts FREQUENCIES ('Month' | 'Year').
   frequency  TEXT NOT NULL DEFAULT 'Month' CHECK (frequency IN ('Month', 'Year')),

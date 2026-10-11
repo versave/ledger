@@ -16,6 +16,7 @@ import PageHeader from '../../layout/PageHeader/PageHeader'
 import { formatEUR } from '../../utils/format'
 import { FREQUENCIES, type Frequency } from '../../../shared/enums'
 import styles from './Income.module.scss'
+import { cx } from '../../utils/cx.ts'
 
 // UI labels for the DB-backed frequency values ('Month' | 'Year').
 const FREQUENCY_LABELS: Record<Frequency, string> = { Month: 'Monthly', Year: 'Yearly' }
@@ -24,6 +25,7 @@ const FREQUENCY_OPTIONS = FREQUENCIES.map((f) => ({ value: f, label: FREQUENCY_L
 interface IncomeRow {
     id: string
     name: string
+    /** Always the monthly amount, integer cents. Amount/Y is derived (×12). */
     amount: number
     frequency: Frequency
     usage: string
@@ -38,18 +40,10 @@ const INITIAL_ROWS: IncomeRow[] = [
         frequency: 'Month',
         usage: 'Lifestyle bucket',
     },
-    {
-        id: 'rent',
-        name: 'Rental income',
-        amount: 796800,
-        frequency: 'Year',
-        usage: 'Property fund',
-    },
+    { id: 'rent', name: 'Rental income', amount: 66400, frequency: 'Year', usage: 'Property fund' },
 ]
 
-// `amount` is stored in the frequency's unit; the other column is derived for display.
-const monthlyOf = (r: IncomeRow) => (r.frequency === 'Month' ? r.amount : Math.round(r.amount / 12))
-const yearlyOf = (r: IncomeRow) => (r.frequency === 'Year' ? r.amount : r.amount * 12)
+const yearlyOf = (r: IncomeRow) => r.amount * 12
 
 export const Income = () => {
     const [editing, setEditing] = useState(false)
@@ -63,17 +57,6 @@ export const Income = () => {
         setRows((rs) => rs.filter((r) => r.id !== id))
     }
 
-    // Switching frequency keeps the real money the same by converting the stored unit.
-    const changeFrequency = (r: IncomeRow, next: Frequency) => {
-        if (next === r.frequency) {
-            return
-        }
-
-        const amount = next === 'Year' ? r.amount * 12 : Math.round(r.amount / 12)
-
-        update(r.id, { frequency: next, amount })
-    }
-
     const addRow = () => {
         setRows((rs) => [
             ...rs,
@@ -81,15 +64,15 @@ export const Income = () => {
         ])
     }
 
-    // Total/M counts Monthly rows only (their amount is already monthly); Total/Y sums every row.
-    const totalM = rows.filter((r) => r.frequency === 'Month').reduce((sum, r) => sum + r.amount, 0)
+    // Frequency is just a label — totals include every row.
+    const totalM = rows.reduce((sum, r) => sum + r.amount, 0)
     const totalY = rows.reduce((sum, r) => sum + yearlyOf(r), 0)
 
     return (
         <>
             <PageHeader
                 title="Income"
-                desc="Enter the amount for each source's frequency; the other column is calculated. The monthly total counts monthly items only."
+                desc="Enter the monthly amount for each source; the yearly figure is calculated."
                 actions={<EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}
             />
 
@@ -137,26 +120,16 @@ export const Income = () => {
                                     )}
                                 </Td>
 
-                                <Td
-                                    numeric
-                                    className={r.frequency !== 'Month' ? styles.derived : undefined}
-                                >
+                                <Td numeric>
                                     <AmountCell
-                                        value={monthlyOf(r)}
-                                        editing={editing && r.frequency === 'Month'}
+                                        value={r.amount}
+                                        editing={editing}
                                         onCommit={(amount) => update(r.id, { amount })}
                                     />
                                 </Td>
 
-                                <Td
-                                    numeric
-                                    className={r.frequency !== 'Year' ? styles.derived : undefined}
-                                >
-                                    <AmountCell
-                                        value={yearlyOf(r)}
-                                        editing={editing && r.frequency === 'Year'}
-                                        onCommit={(amount) => update(r.id, { amount })}
-                                    />
+                                <Td numeric>
+                                    <AmountCell value={yearlyOf(r)} editing={false} />
                                 </Td>
 
                                 <Td>
@@ -166,7 +139,9 @@ export const Income = () => {
                                             options={FREQUENCY_OPTIONS}
                                             aria-label="Frequency"
                                             onChange={(e) =>
-                                                changeFrequency(r, e.target.value as Frequency)
+                                                update(r.id, {
+                                                    frequency: e.target.value as Frequency,
+                                                })
                                             }
                                         />
                                     ) : (
@@ -188,7 +163,9 @@ export const Income = () => {
                                             }
                                         />
                                     ) : (
-                                        <span className={styles.readText}>{r.usage}</span>
+                                        <span className={cx(styles.readText, styles.derived)}>
+                                            {r.usage}
+                                        </span>
                                     )}
                                 </Td>
 
