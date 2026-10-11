@@ -1,0 +1,8 @@
+// Read-mode text aligns with the 8px inset of the inline inputs it replaces.
+.readText {
+    padding: 0 8px;
+}
+
+.muted {
+    color: var(--text-muted);
+}

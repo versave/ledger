@@ -1,19 +1,37 @@
-import type { LucideIcon } from 'lucide-react'
-import { ArrowLeftRight, CreditCard, Landmark, User, Users, Wallet } from 'lucide-react'
-import { ReactElement } from 'react'
-import { Income } from './pages/Income/Income.tsx'
+import type { LucideIcon } from 'lucide-react';
+import {
+    ArrowLeftRight,
+    CreditCard,
+    Landmark,
+    User,
+    Users,
+    UsersRound,
+    Wallet,
+} from 'lucide-react';
+import { ReactElement } from 'react';
+import { Income } from './pages/Income/Income.tsx';
+import { People } from './pages/People/People.tsx';
 
 export interface PageDef {
-    path: string
-    label: string
-    icon: LucideIcon
-    title: string
-    desc: string
-    editable: boolean
-    element?: ReactElement
+    path: string;
+    label: string;
+    icon: LucideIcon;
+    title: string;
+    desc: string;
+    editable: boolean;
+    element?: ReactElement;
 }
 
 export const PAGES: PageDef[] = [
+    {
+        path: '/people',
+        label: 'People',
+        icon: UsersRound,
+        title: 'People',
+        desc: 'Everyone in this ledger. Each person gets their own Income page. The first person is you and drives the Personal spread.',
+        editable: true,
+        element: <People />,
+    },
     {
         path: '/income',
         label: 'Income',
@@ -63,4 +81,4 @@ export const PAGES: PageDef[] = [
         desc: 'A half-yearly snapshot of assets and liabilities. Starting a new review freezes the previous one, so linked values keep the figures from that date.',
         editable: true,
     },
-]
+];
