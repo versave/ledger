@@ -1,131 +1,131 @@
 @use '../../styles/breakpoints' as bp;
 
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: var(--sidebar-w);
-  height: 100vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 22px 14px;
-  z-index: 10;
-  background: var(--green-deep);
-  color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 22px 14px;
+    z-index: 10;
+    background: var(--green-deep);
+    color: #fff;
 
-  @include bp.narrow {
-    position: relative;
-    width: auto;
-    height: auto;
-  }
+    @include bp.narrow {
+        position: relative;
+        width: auto;
+        height: auto;
+    }
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
 }
 
 .brandTile {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--r-btn);
-  background: var(--brass);
-  color: var(--green-deep);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--r-btn);
+    background: var(--brass);
+    color: var(--green-deep);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 15px;
 }
 
 .brandName {
-  font-weight: 700;
-  font-size: var(--fs-panel);
+    font-weight: 700;
+    font-size: var(--fs-panel);
 }
 
 .nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
-  @include bp.narrow {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
+    @include bp.narrow {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 }
 
 .navItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: var(--r-btn);
-  padding: 10px 12px;
-  font-size: var(--fs-cell);
-  font-weight: 500;
-  color: var(--sidebar-text);
-  text-decoration: none;
-
-  svg {
-    flex: none;
-  }
-
-  &:hover {
-    background: var(--green-hover);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: var(--r-btn);
+    padding: 10px 12px;
+    font-size: var(--fs-cell);
+    font-weight: 500;
     color: var(--sidebar-text);
-  }
+    text-decoration: none;
+
+    svg {
+        flex: none;
+    }
+
+    &:hover {
+        background: var(--green-hover);
+        color: var(--sidebar-text);
+    }
 }
 
 .active,
 .active:hover {
-  background: var(--brass);
-  color: var(--green-deep);
-  font-weight: 600;
+    background: var(--brass);
+    color: var(--green-deep);
+    font-weight: 600;
 }
 
 .foot {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .note {
-  padding: 12px;
-  border-radius: var(--r-card);
-  background: var(--green-hover);
-  font-size: var(--fs-caption);
-  line-height: 1.5;
-  color: var(--sidebar-text);
-  display: flex;
-  gap: 8px;
+    padding: 12px;
+    border-radius: var(--r-card);
+    background: var(--green-hover);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    color: var(--sidebar-text);
+    display: flex;
+    gap: 8px;
 
-  svg {
-    flex: none;
-    margin-top: 2px;
-  }
+    svg {
+        flex: none;
+        margin-top: 2px;
+    }
 
-  @include bp.narrow {
-    display: none;
-  }
+    @include bp.narrow {
+        display: none;
+    }
 }
 
 .devLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  font-size: var(--fs-caption);
-  color: color-mix(in srgb, var(--sidebar-text) 60%, transparent);
-  text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    font-size: var(--fs-caption);
+    color: color-mix(in srgb, var(--sidebar-text) 60%, transparent);
+    text-decoration: none;
 
-  &:hover {
-    color: var(--brass);
-  }
+    &:hover {
+        color: var(--brass);
+    }
 }
 
 .devLinkActive {
-  color: var(--brass);
+    color: var(--brass);
 }

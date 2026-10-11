@@ -1,8 +1,9 @@
-import { Link2, Palette } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
-import { PAGES } from '../../navigation.tsx'
-import { cx } from '../../utils/cx'
-import styles from './Sidebar.module.scss'
+import { Link2, Palette } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { PAGES } from '../../navigation.tsx';
+import { cx } from '../../utils/cx';
+import styles from './Sidebar.module.scss';
+import { IncomePagesNavLinks } from '../IncomePagesNavLinks/IncomePagesNavLinks.tsx';
 
 export default function Sidebar() {
     return (
@@ -13,16 +14,22 @@ export default function Sidebar() {
             </div>
 
             <nav className={styles.nav}>
-                {PAGES.map(({ path, label, icon: Icon }) => (
-                    <NavLink
-                        key={path}
-                        to={path}
-                        className={({ isActive }) => cx(styles.navItem, isActive && styles.active)}
-                    >
-                        <Icon size={18} strokeWidth={1.5} />
-                        <span>{label}</span>
-                    </NavLink>
-                ))}
+                {PAGES.map(({ path, label, icon: Icon }) => {
+                    return path === '/income' ? (
+                        <IncomePagesNavLinks key={path} />
+                    ) : (
+                        <NavLink
+                            key={path}
+                            to={path}
+                            className={({ isActive }) =>
+                                cx(styles.navItem, isActive && styles.active)
+                            }
+                        >
+                            <Icon size={18} strokeWidth={1.5} />
+                            <span>{label}</span>
+                        </NavLink>
+                    );
+                })}
             </nav>
 
             <div className={styles.foot}>
@@ -44,5 +51,5 @@ export default function Sidebar() {
                 </NavLink>
             </div>
         </aside>
-    )
+    );
 }

@@ -8,9 +8,10 @@ export interface Income {
     currency: string;
     frequency: Frequency;
     usage: string;
+    holder: string | null; // people.id of the owner, or null
 }
 
-export type IncomeInput = Pick<Income, 'name' | 'amountMonth' | 'frequency' | 'usage'>;
+export type IncomeInput = Pick<Income, 'name' | 'amountMonth' | 'frequency' | 'usage' | 'holder'>;
 
 // New rows created in the UI get a temporary id until the server assigns a real one.
 const TEMP_PREFIX = 'tmp-';
@@ -22,6 +23,7 @@ const toInput = (r: Income): IncomeInput => ({
     amountMonth: r.amountMonth,
     frequency: r.frequency,
     usage: r.usage,
+    holder: r.holder,
 });
 
 export const incomeService = {
@@ -45,5 +47,17 @@ export const incomeService = {
         await Promise.all([...deletes, ...writes]);
 
         return incomeService.list();
+    },
+
+    listByHolder: async (holder: string): Promise<Income[]> =>
+        (await incomeService.list()).filter((r) => r.holder === holder),
+
+    saveForHolder: async (
+        holder: string,
+        original: Income[],
+        current: Income[],
+    ): Promise<Income[]> => {
+        const all = await incomeService.save(original, current);
+        return all.filter((r) => r.holder === holder);
     },
 };

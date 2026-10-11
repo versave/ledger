@@ -62,6 +62,7 @@ export const Income = () => {
                 currency: 'EUR',
                 frequency: 'Month',
                 usage: '',
+                holder: null,
             },
         ])
     }

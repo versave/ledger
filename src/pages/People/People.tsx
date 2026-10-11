@@ -15,6 +15,7 @@ import PageHeader from '../../layout/PageHeader/PageHeader';
 import { newTempId, peopleService, type Person } from '../../services/people.service';
 
 import styles from './People.module.scss';
+import { NavLink } from 'react-router-dom';
 
 export const People = () => {
     const [editing, setEditing] = useState(false);
@@ -100,6 +101,8 @@ export const People = () => {
                         <tr>
                             <Th>Name</Th>
 
+                            <Th>Reference</Th>
+
                             {canDelete && <Th />}
                         </tr>
                     </thead>
@@ -118,6 +121,12 @@ export const People = () => {
                                     ) : (
                                         <span className={styles.readText}>{p.name}</span>
                                     )}
+                                </Td>
+
+                                <Td>
+                                    <NavLink to={`/income/${p.id}`} className={styles.readText}>
+                                        Income
+                                    </NavLink>
                                 </Td>
 
                                 {canDelete && (
