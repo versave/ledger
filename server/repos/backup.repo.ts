@@ -1,7 +1,7 @@
 import type { PGlite } from '@electric-sql/pglite'
 
 // Tables included in a full SQL dump, in dependency order. Extend as the schema grows.
-const TABLES = ['income'] as const
+const TABLES = ['people', 'income'] as const
 
 /** Produces SQL backups spanning every table. */
 export class BackupRepo {

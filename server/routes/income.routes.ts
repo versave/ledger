@@ -26,6 +26,7 @@ export function incomeRoutes(repo: IncomeRepo): Hono {
       currency: typeof body.currency === 'string' ? body.currency : undefined,
       frequency: parseFrequency(body.frequency),
       usage: typeof body.usage === 'string' ? body.usage : undefined,
+      holder: body.holder ? String(body.holder) : undefined,
     })
     return c.json(income, 201)
   })
@@ -50,6 +51,9 @@ export function incomeRoutes(repo: IncomeRepo): Hono {
     }
     if (typeof body.usage === 'string') {
       patch.usage = body.usage
+    }
+    if (body.holder !== undefined) {
+      patch.holder = body.holder ? String(body.holder) : null
     }
 
     const income = await repo.update(c.req.param('id'), patch)

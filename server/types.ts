@@ -10,6 +10,7 @@ export interface Income {
   currency: string
   frequency: Frequency
   usage: string
+  holder: string | null // people.id of the owner, or null
 }
 
 export interface NewIncome {
@@ -18,6 +19,18 @@ export interface NewIncome {
   currency?: string
   frequency?: Frequency
   usage?: string
+  holder?: string | null
 }
 
 export type IncomePatch = NewIncome
+
+export interface Person {
+  id: string
+  name: string
+}
+
+export interface NewPerson {
+  name?: string
+}
+
+export type PersonPatch = NewPerson
