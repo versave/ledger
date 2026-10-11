@@ -32,7 +32,6 @@ interface Props {
     holder?: string;
 }
 
-// todo: Don't request income data here - it must be passed down to this component
 export const IncomeTable = ({ title, desc, holder }: Props) => {
     const [editing, setEditing] = useState(false);
     const [rows, setRows] = useState<IncomeRow[]>([]);
