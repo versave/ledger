@@ -30,7 +30,8 @@ export class BackupRepo {
       const cols = fields.map((f) => f.name)
       for (const row of rows) {
         const values = cols.map((c) => esc(row[c])).join(', ')
-        lines.push(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${values});`)
+        const colList = cols.map((c) => `"${c}"`).join(', ')
+        lines.push(`INSERT INTO ${table} (${colList}) VALUES (${values});`)
       }
     }
     lines.push('COMMIT;', '')

@@ -1,7 +1,7 @@
 import type { PGlite } from '@electric-sql/pglite'
 import type { Income, IncomePatch, NewIncome } from '../types'
 
-const COLUMNS = 'id, name, amount, currency, frequency, usage'
+const COLUMNS = 'id, name, "amountMonth", currency, frequency, usage'
 
 /** Database access for income sources. */
 export class IncomeRepo {
@@ -16,12 +16,12 @@ export class IncomeRepo {
 
   async create(input: NewIncome): Promise<Income> {
     const { rows } = await this.db.query<Income>(
-      `INSERT INTO income (name, amount, currency, frequency, usage)
+      `INSERT INTO income (name, "amountMonth", currency, frequency, usage)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING ${COLUMNS}`,
       [
         input.name ?? '',
-        Math.round(input.amount ?? 0),
+        Math.round(input.amountMonth ?? 0),
         input.currency ?? 'EUR',
         input.frequency ?? 'Month',
         input.usage ?? '',
@@ -42,8 +42,8 @@ export class IncomeRepo {
     if (patch.name !== undefined) {
       set('name', patch.name)
     }
-    if (patch.amount !== undefined) {
-      set('amount', Math.round(patch.amount))
+    if (patch.amountMonth !== undefined) {
+      set('"amountMonth"', Math.round(patch.amountMonth))
     }
     if (patch.currency !== undefined) {
       set('currency', patch.currency)

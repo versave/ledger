@@ -22,7 +22,7 @@ export function incomeRoutes(repo: IncomeRepo): Hono {
     }
     const income = await repo.create({
       name: typeof body.name === 'string' ? body.name : undefined,
-      amount: body.amount !== undefined ? Number(body.amount) : undefined,
+      amountMonth: body.amountMonth !== undefined ? Number(body.amountMonth) : undefined,
       currency: typeof body.currency === 'string' ? body.currency : undefined,
       frequency: parseFrequency(body.frequency),
       usage: typeof body.usage === 'string' ? body.usage : undefined,
@@ -39,8 +39,8 @@ export function incomeRoutes(repo: IncomeRepo): Hono {
     if (typeof body.name === 'string') {
       patch.name = body.name
     }
-    if (body.amount !== undefined) {
-      patch.amount = Number(body.amount)
+    if (body.amountMonth !== undefined) {
+      patch.amountMonth = Number(body.amountMonth)
     }
     if (typeof body.currency === 'string') {
       patch.currency = body.currency

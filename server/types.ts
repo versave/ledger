@@ -6,7 +6,7 @@ export { FREQUENCIES, type Frequency }
 export interface Income {
   id: string
   name: string
-  amount: number // monthly amount, integer cents
+  amountMonth: number // monthly amount, integer cents
   currency: string
   frequency: Frequency
   usage: string
@@ -14,7 +14,7 @@ export interface Income {
 
 export interface NewIncome {
   name?: string
-  amount?: number
+  amountMonth?: number
   currency?: string
   frequency?: Frequency
   usage?: string

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import {
     AmountCell,
@@ -6,6 +6,7 @@ import {
     EditToggle,
     IconButton,
     Input,
+    Note,
     Panel,
     Select,
     Table,
@@ -15,6 +16,7 @@ import {
 import PageHeader from '../../layout/PageHeader/PageHeader'
 import { formatEUR } from '../../utils/format'
 import { FREQUENCIES, type Frequency } from '../../../shared/enums'
+import { incomeService, newTempId, type Income as IncomeRow } from '../../services/income.service'
 import styles from './Income.module.scss'
 import { cx } from '../../utils/cx.ts'
 
@@ -22,32 +24,25 @@ import { cx } from '../../utils/cx.ts'
 const FREQUENCY_LABELS: Record<Frequency, string> = { Month: 'Monthly', Year: 'Yearly' }
 const FREQUENCY_OPTIONS = FREQUENCIES.map((f) => ({ value: f, label: FREQUENCY_LABELS[f] }))
 
-interface IncomeRow {
-    id: string
-    name: string
-    /** Always the monthly amount, integer cents. Amount/Y is derived (×12). */
-    amount: number
-    frequency: Frequency
-    usage: string
-}
-
-const INITIAL_ROWS: IncomeRow[] = [
-    { id: 'salary', name: 'Salary', amount: 297800, frequency: 'Month', usage: 'Monthly fuel' },
-    {
-        id: 'side',
-        name: 'Side projects',
-        amount: 45000,
-        frequency: 'Month',
-        usage: 'Lifestyle bucket',
-    },
-    { id: 'rent', name: 'Rental income', amount: 66400, frequency: 'Year', usage: 'Property fund' },
-]
-
-const yearlyOf = (r: IncomeRow) => r.amount * 12
+const yearlyOf = (r: IncomeRow) => r.amountMonth * 12
 
 export const Income = () => {
     const [editing, setEditing] = useState(false)
-    const [rows, setRows] = useState<IncomeRow[]>(INITIAL_ROWS)
+    const [rows, setRows] = useState<IncomeRow[]>([])
+    const [error, setError] = useState<string | null>(null)
+    const [saving, setSaving] = useState(false)
+    // The last state synced with the server; used to diff on save.
+    const synced = useRef<IncomeRow[]>([])
+
+    useEffect(() => {
+        incomeService
+            .list()
+            .then((data) => {
+                setRows(data)
+                synced.current = data
+            })
+            .catch((e) => setError((e as Error).message))
+    }, [])
 
     const update = (id: string, patch: Partial<IncomeRow>) => {
         setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)))
@@ -60,21 +55,57 @@ export const Income = () => {
     const addRow = () => {
         setRows((rs) => [
             ...rs,
-            { id: crypto.randomUUID(), name: '', amount: 0, frequency: 'Month', usage: '' },
+            {
+                id: newTempId(),
+                name: '',
+                amountMonth: 0,
+                currency: 'EUR',
+                frequency: 'Month',
+                usage: '',
+            },
         ])
     }
 
+    // Edit locally for real-time calcs; on leaving edit mode, persist and resync.
+    const toggleEdit = async () => {
+        if (!editing) {
+            setEditing(true)
+            return
+        }
+
+        if (saving) {
+            return
+        }
+
+        setSaving(true)
+
+        try {
+            const fresh = await incomeService.save(synced.current, rows)
+
+            setRows(fresh)
+            synced.current = fresh
+            setError(null)
+            setEditing(false)
+        } catch (e) {
+            setError((e as Error).message)
+        } finally {
+            setSaving(false)
+        }
+    }
+
     // Frequency is just a label — totals include every row.
-    const totalM = rows.reduce((sum, r) => sum + r.amount, 0)
+    const totalM = rows.reduce((sum, r) => sum + r.amountMonth, 0)
     const totalY = rows.reduce((sum, r) => sum + yearlyOf(r), 0)
 
     return (
         <>
             <PageHeader
                 title="Income"
-                desc="Enter the monthly amount for each source; the yearly figure is calculated."
-                actions={<EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}
+                desc="Enter either the monthly or the yearly amount; the other is calculated."
+                actions={<EditToggle editing={editing} onToggle={toggleEdit} />}
             />
+
+            {error && <Note>{error}</Note>}
 
             <Panel
                 title="Income sources"
@@ -122,14 +153,20 @@ export const Income = () => {
 
                                 <Td numeric>
                                     <AmountCell
-                                        value={r.amount}
+                                        value={r.amountMonth}
                                         editing={editing}
-                                        onCommit={(amount) => update(r.id, { amount })}
+                                        onCommit={(amountMonth) => update(r.id, { amountMonth })}
                                     />
                                 </Td>
 
                                 <Td numeric>
-                                    <AmountCell value={yearlyOf(r)} editing={false} />
+                                    <AmountCell
+                                        value={yearlyOf(r)}
+                                        editing={editing}
+                                        onCommit={(yearly) =>
+                                            update(r.id, { amountMonth: Math.round(yearly / 12) })
+                                        }
+                                    />
                                 </Td>
 
                                 <Td>
