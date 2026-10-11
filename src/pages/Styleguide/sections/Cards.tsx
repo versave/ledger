@@ -6,7 +6,7 @@ import Section from '../Section'
 import styles from '../Styleguide.module.scss'
 
 export default function Cards() {
-  const [income, setIncome] = useState(4250)
+  const [income, setIncome] = useState(425000)
 
   return (
     <Section title="Cards">
@@ -24,9 +24,9 @@ export default function Cards() {
         <Panel title="Transfer per account" sub="SummaryList">
           <SummaryList
             items={[
-              { label: 'Entertainment / Personal', sub: '3 fixed · 1 offset', value: formatEUR(640) },
-              { label: 'Joint', sub: '2 fixed', value: formatEUR(1520) },
-              { label: 'Investments', sub: 'Nothing to transfer', value: formatEUR(-35), color: 'var(--warn)' },
+              { label: 'Entertainment / Personal', sub: '3 fixed · 1 offset', value: formatEUR(64000) },
+              { label: 'Joint', sub: '2 fixed', value: formatEUR(152000) },
+              { label: 'Investments', sub: 'Nothing to transfer', value: formatEUR(-3500), color: 'var(--warn)' },
             ]}
           />
         </Panel>

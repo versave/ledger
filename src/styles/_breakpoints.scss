@@ -3,13 +3,13 @@ $narrow: 979px;
 $small: 720px;
 
 @mixin narrow {
-  @media (max-width: $narrow) {
-    @content;
-  }
+    @media (max-width: $narrow) {
+        @content;
+    }
 }
 
 @mixin small {
-  @media (max-width: $small) {
-    @content;
-  }
+    @media (max-width: $small) {
+        @content;
+    }
 }

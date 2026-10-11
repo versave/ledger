@@ -1,6 +1,7 @@
-export type Frequency = 'Month' | 'Year'
+import { FREQUENCIES, type Frequency } from '../shared/enums'
 
-export const FREQUENCIES: Frequency[] = ['Month', 'Year']
+// Re-export the shared enum so server modules can keep importing from './types'.
+export { FREQUENCIES, type Frequency }
 
 export interface Income {
   id: string

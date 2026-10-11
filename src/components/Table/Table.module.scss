@@ -1,60 +1,75 @@
 .wrap {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
 .table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 
-  th,
-  td {
-    padding: 0 8px;
-    text-align: left;
-
-    &:first-child {
-      padding-left: 22px;
-    }
-
-    &:last-child {
-      padding-right: 22px;
-    }
-  }
-
-  thead th {
-    height: 38px;
-    background: var(--band);
-    border-block: 1px solid var(--hairline);
-    font-size: var(--fs-sub);
-    font-weight: 500;
-    color: var(--text-muted);
-  }
-
-  tbody {
+    th,
     td {
-      height: 54px;
-      border-bottom: 1px solid var(--hairline);
-      font-size: var(--fs-cell);
+        padding: 0 8px;
+        text-align: left;
+
+        &:first-child {
+            padding-left: 22px;
+        }
+
+        &:last-child {
+            padding-right: 22px;
+        }
     }
 
-    tr:hover {
-      background: var(--band);
+    // Body content sits 8px in from the cell gutter (inputs and read-mode spans
+    // carry that inset); match it on header/footer so labels line up with values.
+    thead th,
+    tfoot td {
+        padding: 0 16px;
+
+        &:first-child {
+            padding-left: 30px;
+        }
+
+        &:last-child {
+            padding-right: 30px;
+        }
     }
-  }
 
-  tfoot td {
-    height: 46px;
-    background: var(--band);
-    font-size: var(--fs-cell);
-    font-weight: 700;
-  }
+    thead th {
+        height: 38px;
+        background: var(--band);
+        border-block: 1px solid var(--hairline);
+        font-size: var(--fs-sub);
+        font-weight: 500;
+        color: var(--text-muted);
+    }
 
-  // Nested so they outrank the th/td defaults above.
-  .numeric {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
+    tbody {
+        td {
+            height: 54px;
+            border-bottom: 1px solid var(--hairline);
+            font-size: var(--fs-cell);
+        }
 
-  .muted {
-    color: var(--text-muted);
-  }
+        tr:hover {
+            background: var(--band);
+        }
+    }
+
+    tfoot td {
+        height: 46px;
+        background: var(--band);
+        font-size: var(--fs-cell);
+        font-weight: 700;
+    }
+
+    // Nested so they outrank the th/td defaults above.
+    .numeric {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .muted {
+        color: var(--text-muted);
+    }
 }

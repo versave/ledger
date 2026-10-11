@@ -33,7 +33,7 @@ export default function Controls() {
   const [editing, setEditing] = useState(false)
   const [half, setHalf] = useState<'H1' | 'H2'>('H1')
   const [checked, setChecked] = useState(true)
-  const [amount, setAmount] = useState(2978)
+  const [amount, setAmount] = useState(297800)
   const [color, setColor] = useState(CHART_PALETTE[1])
 
   return (

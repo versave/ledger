@@ -8,19 +8,19 @@ import Tables from './sections/Tables'
 import Typography from './sections/Typography'
 
 export default function Styleguide() {
-  return (
-    <>
-      <PageHeader
-        title="Styleguide"
-        desc="Design tokens and every reusable component in src/components. Tokens live in src/styles/_tokens.scss."
-      />
-      <Colors />
-      <Typography />
-      <Shape />
-      <Controls />
-      <Cards />
-      <Tables />
-      <Charts />
-    </>
-  )
+    return (
+        <>
+            <PageHeader
+                title="Styleguide"
+                desc="Design tokens and every reusable component in src/components. Tokens live in src/styles/_tokens.scss."
+            />
+            <Colors />
+            <Typography />
+            <Shape />
+            <Controls />
+            <Cards />
+            <Tables />
+            <Charts />
+        </>
+    )
 }
