@@ -1,0 +1,26 @@
+// Read-mode text aligns with the 8px inset of the inline inputs it replaces.
+.readText {
+    padding: 0 8px;
+}
+
+// The derived (non-basis) amount: ×12 / ÷12 of the entered one, shown muted.
+// Applied to the <Td> so both the read-mode value and the edit-mode input dim.
+.derived {
+    color: var(--text-muted);
+
+    input {
+        color: var(--text-muted);
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+}

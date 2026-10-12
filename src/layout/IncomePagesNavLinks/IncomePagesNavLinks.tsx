@@ -46,6 +46,16 @@ export const IncomePagesNavLinks = () => {
                     <span>{person.name}</span>
                 </NavLink>
             ))}
+
+            <NavLink
+                key="income-joint"
+                to="/income/joint"
+                className={({ isActive }) =>
+                    cx(incomePageNavLinkStyles.subLink, isActive && incomePageNavLinkStyles.active)
+                }
+            >
+                <span>Joint</span>
+            </NavLink>
         </>
     ) : (
         <IncomeRoute />
