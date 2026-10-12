@@ -9,7 +9,7 @@ import {
     Wallet,
 } from 'lucide-react';
 import { ReactElement } from 'react';
-import { Income } from './pages/Income/Income.tsx';
+import { IncomePage } from './pages/Income/Income.tsx';
 import { People } from './pages/People/People.tsx';
 
 export interface PageDef {
@@ -39,7 +39,7 @@ export const PAGES: PageDef[] = [
         title: 'Income',
         desc: 'Enter either the monthly or the yearly amount; the other is calculated. The monthly total counts monthly items only.',
         editable: true,
-        element: <Income />,
+        element: <IncomePage />,
     },
     {
         path: '/personal',

@@ -1,242 +1,158 @@
-import { useEffect, useRef, useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import PageHeader from '../../layout/PageHeader/PageHeader';
+import { useEffect, useState } from 'react';
+import { incomeService } from '../../services/income.service.ts';
 import {
     AmountCell,
-    Button,
-    EditToggle,
-    IconButton,
-    Input,
-    Note,
+    DonutChart,
+    type DonutSegment,
+    KpiCard,
     Panel,
-    Select,
     Table,
     Td,
     Th,
-} from '../../components'
-import PageHeader from '../../layout/PageHeader/PageHeader'
-import { formatEUR } from '../../utils/format'
-import { FREQUENCIES, type Frequency } from '../../../shared/enums'
-import { incomeService, newTempId, type Income as IncomeRow } from '../../services/income.service'
-import styles from './Income.module.scss'
-import { cx } from '../../utils/cx.ts'
+} from '../../components';
+import styles from './Income.module.scss';
+import { IncomeHolderTotals } from '../../../server/types.ts';
+import { formatEUR, formatPct } from '../../utils/format.ts';
+import { CHART_PALETTE } from '../../styles/palette.ts';
 
-// UI labels for the DB-backed frequency values ('Month' | 'Year').
-const FREQUENCY_LABELS: Record<Frequency, string> = { Month: 'Monthly', Year: 'Yearly' }
-const FREQUENCY_OPTIONS = FREQUENCIES.map((f) => ({ value: f, label: FREQUENCY_LABELS[f] }))
+interface Row {
+    id: string;
+    holderName: string;
+    incomeM: number;
+    incomeY: number;
+    share: number;
+}
 
-const yearlyOf = (r: IncomeRow) => r.amountMonth * 12
+const calculateSharePercent = (combinedIncome: number, income: number) =>
+    (income / combinedIncome) * 100;
 
-export const Income = () => {
-    const [editing, setEditing] = useState(false)
-    const [rows, setRows] = useState<IncomeRow[]>([])
-    const [error, setError] = useState<string | null>(null)
-    const [saving, setSaving] = useState(false)
-    // The last state synced with the server; used to diff on save.
-    const synced = useRef<IncomeRow[]>([])
+export const IncomePage = () => {
+    const [incomeHolderTotals, setIncomeHolderTotals] = useState<IncomeHolderTotals[]>([]);
+    const [donutChartSegments, setDonutChartSegments] = useState<DonutSegment[]>([]);
+    const [rows, setRows] = useState<Row[]>([]);
 
     useEffect(() => {
-        incomeService
-            .list()
-            .then((data) => {
-                setRows(data)
-                synced.current = data
-            })
-            .catch((e) => setError((e as Error).message))
-    }, [])
+        incomeService.getAllHolderTotals().then((holderTotals) => {
+            setIncomeHolderTotals(holderTotals);
+            setDonutChartSegments(
+                holderTotals.map((hT, idx) => ({
+                    key: hT.id,
+                    label: hT.holder.name,
+                    value: hT.amountMonth,
+                    color: CHART_PALETTE[idx],
+                })),
+            );
+            setRows(
+                holderTotals.map((hT) => ({
+                    id: hT.id,
+                    holderName: hT.holder.name,
+                    incomeM: hT.amountMonth,
+                    incomeY: hT.amountYear,
+                    share: calculateSharePercent(combinedMonthly, hT.amountMonth),
+                })),
+            );
+        });
+    }, []);
 
-    const update = (id: string, patch: Partial<IncomeRow>) => {
-        setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)))
-    }
-
-    const remove = (id: string) => {
-        setRows((rs) => rs.filter((r) => r.id !== id))
-    }
-
-    const addRow = () => {
-        setRows((rs) => [
-            ...rs,
-            {
-                id: newTempId(),
-                name: '',
-                amountMonth: 0,
-                currency: 'EUR',
-                frequency: 'Month',
-                usage: '',
-                holder: null,
-            },
-        ])
-    }
-
-    // Edit locally for real-time calcs; on leaving edit mode, persist and resync.
-    const toggleEdit = async () => {
-        if (!editing) {
-            setEditing(true)
-            return
-        }
-
-        if (saving) {
-            return
-        }
-
-        setSaving(true)
-
-        try {
-            const fresh = await incomeService.save(synced.current, rows)
-
-            setRows(fresh)
-            synced.current = fresh
-            setError(null)
-            setEditing(false)
-        } catch (e) {
-            setError((e as Error).message)
-        } finally {
-            setSaving(false)
-        }
-    }
-
-    // Frequency is just a label — totals include every row.
-    const totalM = rows.reduce((sum, r) => sum + r.amountMonth, 0)
-    const totalY = rows.reduce((sum, r) => sum + yearlyOf(r), 0)
+    const combinedMonthly = incomeHolderTotals.reduce((sum, income) => sum + income.amountMonth, 0);
+    const combinedYearly = incomeHolderTotals.reduce((sum, income) => sum + income.amountYear, 0);
 
     return (
         <>
             <PageHeader
                 title="Income"
-                desc="Enter either the monthly or the yearly amount; the other is calculated."
-                actions={<EditToggle editing={editing} onToggle={toggleEdit} />}
+                desc="Totals from each person’s income page and the joint total. Edit income sources on each person’s page."
             />
 
-            {error && <Note>{error}</Note>}
+            <div className={styles.content}>
+                <div className={styles.cards}>
+                    <KpiCard
+                        label="Combined income / month"
+                        value={formatEUR(combinedMonthly)}
+                        sub={`${incomeHolderTotals.length} people · monthly items`}
+                    />
 
-            <Panel
-                title="Income sources"
-                sub={`${rows.length} ${rows.length === 1 ? 'source' : 'sources'}`}
-                actions={
-                    editing && (
-                        <Button icon={<Plus size={14} strokeWidth={1.75} />} onClick={addRow}>
-                            Add income source
-                        </Button>
-                    )
-                }
-            >
-                <Table minWidth={720}>
-                    <thead>
-                        <tr>
-                            <Th>Source</Th>
+                    <KpiCard
+                        label="Combined income / month"
+                        value={formatEUR(combinedYearly)}
+                        sub={`${incomeHolderTotals.length} people · monthly items`}
+                    />
 
-                            <Th numeric>Amount/M</Th>
+                    {incomeHolderTotals.map((incTotals) => (
+                        <KpiCard
+                            label={`${incTotals.holder.name} / Month`}
+                            value={formatEUR(incTotals.amountMonth)}
+                            sub={`${formatPct(calculateSharePercent(combinedMonthly, incTotals.amountMonth))} of combined`}
+                        />
+                    ))}
+                </div>
 
-                            <Th numeric>Amount/Y</Th>
+                <Panel kicker="Income by person" title="Monthly">
+                    <DonutChart
+                        segments={donutChartSegments}
+                        centerValue={formatEUR(combinedMonthly)}
+                        centerLabel="Combined / month"
+                        onColorChange={(key, color) =>
+                            setDonutChartSegments((ss) =>
+                                ss.map((s) => (s.key === key ? { ...s, color } : s)),
+                            )
+                        }
+                    />
+                </Panel>
 
-                            <Th>Frequency</Th>
+                <Panel title="Income by person" sub="Derived from each person’s income sources">
+                    <Table minWidth={680}>
+                        <thead>
+                            <tr>
+                                <Th>Person</Th>
 
-                            <Th>Usage</Th>
+                                <Th numeric>Income/M</Th>
 
-                            {editing && <Th />}
-                        </tr>
-                    </thead>
+                                <Th numeric>Income/Y</Th>
 
-                    <tbody>
-                        {rows.map((r) => (
-                            <tr key={r.id}>
-                                <Td>
-                                    {editing ? (
-                                        <Input
-                                            value={r.name}
-                                            placeholder="Name"
-                                            aria-label="Source name"
-                                            onChange={(e) => update(r.id, { name: e.target.value })}
-                                        />
-                                    ) : (
-                                        <span className={styles.readText}>{r.name}</span>
-                                    )}
-                                </Td>
-
-                                <Td numeric>
-                                    <AmountCell
-                                        value={r.amountMonth}
-                                        editing={editing}
-                                        onCommit={(amountMonth) => update(r.id, { amountMonth })}
-                                    />
-                                </Td>
-
-                                <Td numeric>
-                                    <AmountCell
-                                        value={yearlyOf(r)}
-                                        editing={editing}
-                                        onCommit={(yearly) =>
-                                            update(r.id, { amountMonth: Math.round(yearly / 12) })
-                                        }
-                                    />
-                                </Td>
-
-                                <Td>
-                                    {editing ? (
-                                        <Select
-                                            value={r.frequency}
-                                            options={FREQUENCY_OPTIONS}
-                                            aria-label="Frequency"
-                                            onChange={(e) =>
-                                                update(r.id, {
-                                                    frequency: e.target.value as Frequency,
-                                                })
-                                            }
-                                        />
-                                    ) : (
-                                        <span className={styles.readText}>
-                                            {FREQUENCY_LABELS[r.frequency]}
-                                        </span>
-                                    )}
-                                </Td>
-
-                                <Td>
-                                    {editing ? (
-                                        <Input
-                                            variant="subtle"
-                                            value={r.usage}
-                                            placeholder="Usage"
-                                            aria-label="Usage"
-                                            onChange={(e) =>
-                                                update(r.id, { usage: e.target.value })
-                                            }
-                                        />
-                                    ) : (
-                                        <span className={cx(styles.readText, styles.derived)}>
-                                            {r.usage}
-                                        </span>
-                                    )}
-                                </Td>
-
-                                {editing && (
-                                    <Td>
-                                        <IconButton
-                                            icon={<X size={14} strokeWidth={1.5} />}
-                                            label="Remove row"
-                                            onClick={() => remove(r.id)}
-                                        />
-                                    </Td>
-                                )}
+                                <Th numeric>Share</Th>
                             </tr>
-                        ))}
-                    </tbody>
+                        </thead>
 
-                    <tfoot>
-                        <tr>
-                            <Td>Total</Td>
+                        <tbody>
+                            {rows.map((row) => {
+                                return (
+                                    <tr key={row.id}>
+                                        <Td>{row.holderName}</Td>
 
-                            <Td numeric>{formatEUR(totalM)}</Td>
+                                        <Td numeric>
+                                            <AmountCell value={row.incomeM} editing={false} />
+                                        </Td>
 
-                            <Td numeric>{formatEUR(totalY)}</Td>
+                                        <Td numeric>
+                                            <AmountCell value={row.incomeY} editing={false} />
+                                        </Td>
 
-                            <Td />
+                                        <Td numeric>
+                                            {formatPct(
+                                                calculateSharePercent(combinedMonthly, row.incomeM),
+                                            )}
+                                        </Td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
 
-                            <Td />
+                        <tfoot>
+                            <tr>
+                                <Td>Joint total</Td>
 
-                            {editing && <Td />}
-                        </tr>
-                    </tfoot>
-                </Table>
-            </Panel>
+                                <Td numeric>{formatEUR(combinedMonthly)}</Td>
+
+                                <Td numeric>{formatEUR(combinedYearly)}</Td>
+
+                                <Td numeric>{formatPct(100)}</Td>
+                            </tr>
+                        </tfoot>
+                    </Table>
+                </Panel>
+            </div>
         </>
-    )
-}
+    );
+};

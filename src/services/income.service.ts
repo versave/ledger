@@ -1,5 +1,6 @@
 import type { Frequency } from '../../shared/enums';
 import { http } from './http';
+import { IncomeHolderTotals } from '../../shared/income.shared.ts';
 
 export interface Income {
     id: string;
@@ -28,6 +29,7 @@ const toInput = (r: Income): IncomeInput => ({
 
 export const incomeService = {
     list: () => http.get<Income[]>('/income'),
+    getAllHolderTotals: () => http.get<IncomeHolderTotals[]>('/income/holder-totals'),
     create: (input: IncomeInput) => http.post<Income>('/income', input),
     update: (id: string, patch: Partial<IncomeInput>) => http.patch<Income>(`/income/${id}`, patch),
     remove: (id: string) => http.delete(`/income/${id}`),
