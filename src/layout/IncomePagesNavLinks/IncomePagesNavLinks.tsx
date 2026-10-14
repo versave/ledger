@@ -3,7 +3,6 @@ import { peopleService, Person } from '../../services/people.service.ts';
 import { NavLink } from 'react-router-dom';
 import { cx } from '../../utils/cx.ts';
 import styles from '../Sidebar/Sidebar.module.scss';
-import incomePageNavLinkStyles from './IncomePagesNavLinks.module.scss';
 import { Wallet } from 'lucide-react';
 
 const IncomeRoute = () => {
@@ -37,10 +36,7 @@ export const IncomePagesNavLinks = () => {
                     key={person.id}
                     to={`/income/${person.id}`}
                     className={({ isActive }) =>
-                        cx(
-                            incomePageNavLinkStyles.subLink,
-                            isActive && incomePageNavLinkStyles.active,
-                        )
+                        cx(styles.subLink, isActive && styles.subLinkActive)
                     }
                 >
                     <span>{person.name}</span>
@@ -50,9 +46,7 @@ export const IncomePagesNavLinks = () => {
             <NavLink
                 key="income-joint"
                 to="/income/joint"
-                className={({ isActive }) =>
-                    cx(incomePageNavLinkStyles.subLink, isActive && incomePageNavLinkStyles.active)
-                }
+                className={({ isActive }) => cx(styles.subLink, isActive && styles.subLinkActive)}
             >
                 <span>Joint</span>
             </NavLink>

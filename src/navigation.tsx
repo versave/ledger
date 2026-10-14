@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import { LucideIcon, Receipt } from 'lucide-react';
 import {
     ArrowLeftRight,
     CreditCard,
@@ -40,6 +40,14 @@ export const PAGES: PageDef[] = [
         desc: 'Enter either the monthly or the yearly amount; the other is calculated. The monthly total counts monthly items only.',
         editable: true,
         element: <IncomePersonPage />,
+    },
+    {
+        path: '/expense',
+        label: 'Expenses',
+        icon: Receipt,
+        title: 'Expenses',
+        desc: 'Expenses',
+        editable: true,
     },
     {
         path: '/personal',

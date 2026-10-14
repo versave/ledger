@@ -4,6 +4,7 @@ import { PAGES } from '../../navigation.tsx';
 import { cx } from '../../utils/cx';
 import styles from './Sidebar.module.scss';
 import { IncomePagesNavLinks } from '../IncomePagesNavLinks/IncomePagesNavLinks.tsx';
+import { ExpensePagesNavLinks } from '../ExpensePagesNavLinks/ExpensePagesNavLinks.tsx';
 
 export default function Sidebar() {
     return (
@@ -15,20 +16,27 @@ export default function Sidebar() {
 
             <nav className={styles.nav}>
                 {PAGES.map(({ path, label, icon: Icon }) => {
-                    return path === '/income' ? (
-                        <IncomePagesNavLinks key={path} />
-                    ) : (
-                        <NavLink
-                            key={path}
-                            to={path}
-                            className={({ isActive }) =>
-                                cx(styles.navItem, isActive && styles.active)
-                            }
-                        >
-                            <Icon size={18} strokeWidth={1.5} />
-                            <span>{label}</span>
-                        </NavLink>
-                    );
+                    switch (path) {
+                        case '/income': {
+                            return <IncomePagesNavLinks key={path} />;
+                        }
+                        case '/expense': {
+                            return <ExpensePagesNavLinks key={path} />;
+                        }
+                        default:
+                            return (
+                                <NavLink
+                                    key={path}
+                                    to={path}
+                                    className={({ isActive }) =>
+                                        cx(styles.navItem, isActive && styles.active)
+                                    }
+                                >
+                                    <Icon size={18} strokeWidth={1.5} />
+                                    <span>{label}</span>
+                                </NavLink>
+                            );
+                    }
                 })}
             </nav>
 

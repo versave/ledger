@@ -6,6 +6,8 @@ import { IncomePersonPage } from './pages/Income/IncomePersonPage.tsx';
 import { IncomeIndexRedirect } from './pages/Income/IncomeIndexRedirect.tsx';
 import { Shell } from './layout/Shell/Shell.tsx';
 import { IncomeJointPage } from './pages/IncomeJointPage/IncomeJointPage.tsx';
+import { ExpensePersonalPage } from './pages/Expense/ExpensePersonal.tsx';
+import { ExpenseJointPage } from './pages/Expense/ExpenseJoint.tsx';
 
 export default function App() {
     return (
@@ -13,7 +15,7 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<Navigate to={PAGES[0].path} replace />} />
 
-                {PAGES.filter((p) => p.path !== '/income').map((p) => (
+                {PAGES.filter((p) => p.path !== '/income' && p.path !== '/expense').map((p) => (
                     <Route
                         key={p.path}
                         path={p.path}
@@ -26,6 +28,12 @@ export default function App() {
                 <Route path="/income/:personId" element={<IncomePersonPage />} />
 
                 <Route path="/income/joint" element={<IncomeJointPage />} />
+
+                <Route path="/expense" element={<Navigate to="/expense/personal" replace />} />
+
+                <Route path="/expense/personal" element={<ExpensePersonalPage />} />
+
+                <Route path="/expense/joint" element={<ExpenseJointPage />} />
 
                 <Route path="/styleguide" element={<Styleguide />} />
 
