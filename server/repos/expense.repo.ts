@@ -11,7 +11,17 @@ const amountToColumns = (amount: Amount): { cents: number | null; ref: string | 
 export class ExpenseRepo {
     constructor(private readonly db: PGlite) {}
 
-    async create(input: ExpenseBody): Promise<Expense> {
+    public async list(): Promise<Expense[]> {
+        const { rows } = await this.db.query<ExpenseRow>(`${SELECT} ORDER BY created_at`);
+
+        return rows.map((r) => ({
+            id: r.id,
+            name: r.name,
+            amount: rowToAmount(r),
+        }));
+    }
+
+    public async create(input: ExpenseBody): Promise<Expense> {
         const { cents, ref } = amountToColumns(input.amount ?? 0);
         const { rows } = await this.db.query<{ id: string }>(
             `INSERT INTO personal_expense (name, amount_cents, amount_ref) VALUES ($1, $2, $3) RETURNING id`,
@@ -20,6 +30,44 @@ export class ExpenseRepo {
         const id = rows[0].id;
 
         return (await this.get(id)) as Expense;
+    }
+
+    public async update(id: string, patch: ExpenseBody): Promise<Expense | null> {
+        if (!(await this.get(id))) {
+            return null;
+        }
+
+        const sets: string[] = [];
+        const values: unknown[] = [];
+        const set = (col: string, value: unknown) => {
+            values.push(value);
+            sets.push(`${col} = $${values.length}`);
+        };
+
+        if (patch.name !== undefined) {
+            set('name', patch.name);
+        }
+
+        if (patch.amount !== undefined) {
+            const { cents, ref } = amountToColumns(patch.amount);
+            set('amount_cents', cents);
+            set('amount_ref', ref);
+        }
+
+        if (sets.length > 0) {
+            values.push(id);
+
+            await this.db.query(
+                `UPDATE personal_expense SET ${sets.join(', ')} WHERE id = $${values.length}`,
+                values,
+            );
+        }
+
+        return this.get(id);
+    }
+
+    public async remove(id: string): Promise<void> {
+        await this.db.query('DELETE FROM personal_expense WHERE id = $1', [id]);
     }
 
     private async get(id: string): Promise<Expense | null> {
