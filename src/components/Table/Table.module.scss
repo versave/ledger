@@ -5,6 +5,14 @@
 .table {
     width: 100%;
     border-collapse: collapse;
+}
+
+// Columns keep the widths set on <Th>, so they don't shift between read/edit mode.
+.fixed {
+    table-layout: fixed;
+}
+
+.table {
 
     th,
     td {
@@ -61,6 +69,11 @@
         background: var(--band);
         font-size: var(--fs-cell);
         font-weight: 700;
+    }
+
+    // Separate stacked footer rows (e.g. Total / Total rounded).
+    tfoot tr + tr td {
+        border-top: 1px solid var(--hairline);
     }
 
     // Nested so they outrank the th/td defaults above.

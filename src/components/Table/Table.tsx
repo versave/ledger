@@ -5,14 +5,16 @@ import styles from './Table.module.scss'
 interface TableProps {
     /** Below this width the table scrolls horizontally inside its card. */
     minWidth?: number | string
+    /** Fixed layout: columns keep their width (set via <Th> widths) instead of resizing to content. */
+    fixed?: boolean
     children: ReactNode
 }
 
 /** Use with native thead/tbody/tfoot; header band, row hover and footer totals are styled here. */
-export const Table = ({ minWidth, children }: TableProps) => {
+export const Table = ({ minWidth, fixed, children }: TableProps) => {
     return (
         <div className={styles.wrap}>
-            <table className={styles.table} style={{ minWidth }}>
+            <table className={cx(styles.table, fixed && styles.fixed)} style={{ minWidth }}>
                 {children}
             </table>
         </div>

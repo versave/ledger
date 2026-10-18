@@ -1,0 +1,43 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+}
+
+.nameCell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+// Read-mode text aligns with the 8px inset of the inline inputs it replaces.
+.readText {
+    padding: 0 8px;
+}
+
+.muted {
+    color: var(--text-muted);
+}
+
+// Edit-mode per-person split cell: a % input with the resolved € underneath.
+.splitEdit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.pctWrap {
+    width: 72px;
+}
+
+.splitSub {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
