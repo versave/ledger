@@ -11,6 +11,7 @@ import {
     IconButton,
     Input,
     KpiCard,
+    Label,
     Note,
     Panel,
     Table,
@@ -19,16 +20,16 @@ import {
     Th,
 } from '../../components';
 import PageHeader from '../../layout/PageHeader/PageHeader';
-import { formatEUR } from '../../utils/format';
+import { formatEUR, formatPct } from '../../utils/format';
 import { cx } from '../../utils/cx';
 import { CHART_PALETTE, REMAINDER_COLOR } from '../../styles/palette';
 import {
     incomeShares,
     jointTotal,
+    jointTotalRounded,
     sliceActual,
     sliceRounded,
     type JointExpenseCalc,
-    jointTotalRounded,
 } from '../../../shared/calc';
 import {
     jointExpenseService,
@@ -38,6 +39,8 @@ import {
 import { incomeService } from '../../services/income.service';
 import { peopleService, type Person } from '../../services/people.service';
 import styles from './ExpenseJoint.module.scss';
+import { SplitCell } from './SplitCell';
+import { TotalsRow } from './TotalsRow';
 
 const PCT_STEP = 5; // income shares round to the nearest 5%
 const STEP_CENTS = 1000; // the rounded joint total rounds up to the nearest €10
@@ -50,8 +53,8 @@ export const ExpenseJointPage = () => {
     const [editing, setEditing] = useState(false);
     const [rows, setRows] = useState<ResolvedJointExpense[]>([]);
     const [people, setPeople] = useState<Person[]>([]);
-    const [donutChartSegments, setDonutChartSegments] = useState<DonutSegment[]>([]);
     const [incomeByPerson, setIncomeByPerson] = useState<Record<string, number>>({});
+    const [colors, setColors] = useState<Record<string, string>>({});
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const synced = useRef<ResolvedJointExpense[]>([]);
@@ -64,103 +67,26 @@ export const ExpenseJointPage = () => {
                 setPeople(ppl);
 
                 const byPerson: Record<string, number> = {};
-
                 for (const p of ppl) {
                     byPerson[p.id] = 0;
                 }
-
                 for (const i of incomes) {
                     if (i.holder && i.holder in byPerson) {
                         byPerson[i.holder] += i.amountMonth;
                     }
                 }
-
-                const expensesDonutSegments = expenses.map((exp, idx) => {
-                    const amount = exp.amount;
-                    const isLiteral = typeof amount === 'number';
-
-                    return {
-                        key: exp.id,
-                        label: exp.name,
-                        value: isLiteral ? amount : amount.value,
-                        color: CHART_PALETTE[idx],
-                    };
-                });
-                // todo: Fix adding this to chart - sometimes does not appear or chart does not update
-                const roundingBuffer =
-                    jointTotalRoundedExpenses - jointTotal(calcExpenses, NO_REFS);
-
-                if (roundingBuffer > 0) {
-                    expensesDonutSegments.push({
-                        key: 'expenses-rounding-buffer',
-                        label: 'Rounding buffer',
-                        value: roundingBuffer,
-                        color: REMAINDER_COLOR,
-                    });
-                }
-
-                setDonutChartSegments(expensesDonutSegments);
-
                 setIncomeByPerson(byPerson);
             })
             .catch((e) => setError((e as Error).message));
     }, []);
 
-    const update = (id: string, patch: Partial<ResolvedJointExpense>) => {
+    const update = (id: string, patch: Partial<ResolvedJointExpense>) =>
         setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-    };
 
-    const remove = (id: string) => {
-        setRows((rs) => rs.filter((r) => r.id !== id));
-    };
+    const remove = (id: string) => setRows((rs) => rs.filter((r) => r.id !== id));
 
-    const addRow = () => {
+    const addRow = () =>
         setRows((rs) => [...rs, { id: newTempId(), name: '', amount: 0, split: null }]);
-    };
-
-    const { actual, rounded } = incomeShares(incomeByPerson, PCT_STEP);
-
-    // The % a person pays of an expense: custom split, else their rounded income share.
-    const pctOf = (e: ResolvedJointExpense, personId: string): number =>
-        e.split ? (e.split[personId] ?? 0) : (rounded[personId] ?? 0);
-
-    // Switching a row to custom seeds each person with their default rounded share.
-    const toggleCustom = (id: string) => {
-        setRows((rs) =>
-            rs.map((r) => {
-                if (r.id !== id) {
-                    return r;
-                }
-                if (r.split) {
-                    return { ...r, split: null };
-                }
-                const split: Record<string, number> = {};
-                for (const p of people) {
-                    split[p.id] = rounded[p.id] ?? 0;
-                }
-                return { ...r, split };
-            }),
-        );
-    };
-
-    // Editing a split %: with exactly two people, the other auto-fills to 100.
-    const setSplit = (id: string, personId: string, pct: number) => {
-        setRows((rs) =>
-            rs.map((r) => {
-                if (r.id !== id || !r.split) {
-                    return r;
-                }
-                const split = { ...r.split, [personId]: pct };
-                if (people.length === 2) {
-                    const other = people.find((p) => p.id !== personId);
-                    if (other) {
-                        split[other.id] = Math.max(0, 100 - pct);
-                    }
-                }
-                return { ...r, split };
-            }),
-        );
-    };
 
     const toggleEdit = async () => {
         if (!editing) {
@@ -184,10 +110,42 @@ export const ExpenseJointPage = () => {
         }
     };
 
+    const { actual, rounded } = incomeShares(incomeByPerson, PCT_STEP);
+
+    // The % a person pays of an expense: custom split, else their rounded income share.
+    const pctOf = (e: ResolvedJointExpense, personId: string): number =>
+        e.split ? (e.split[personId] ?? 0) : (rounded[personId] ?? 0);
+
+    // Switching a row to custom seeds each person with their default rounded share.
+    const toggleCustom = (r: ResolvedJointExpense) =>
+        update(r.id, {
+            split: r.split
+                ? null
+                : Object.fromEntries(people.map((p) => [p.id, rounded[p.id] ?? 0])),
+        });
+
+    // Editing a split %: with exactly two people, the other auto-fills to 100.
+    const setSplit = (r: ResolvedJointExpense, personId: string, pct: number) => {
+        if (!r.split) {
+            return;
+        }
+        const split = { ...r.split, [personId]: pct };
+        if (people.length === 2) {
+            const other = people.find((p) => p.id !== personId);
+            if (other) {
+                split[other.id] = Math.max(0, 100 - pct);
+            }
+        }
+        update(r.id, { split });
+    };
+
     const calcExpenses: JointExpenseCalc[] = rows.map((r) => ({
         amount: valueOf(r),
         split: r.split,
     }));
+    const monthlyTotal = jointTotalRounded(calcExpenses, NO_REFS, STEP_CENTS);
+    const combinedIncome = Object.values(incomeByPerson).reduce((s, v) => s + v, 0);
+
     const customCount = rows.filter((r) => r.split).length;
     const badCount = rows.filter(
         (r) => r.split && Math.abs(Object.values(r.split).reduce((s, v) => s + v, 0) - 100) > 0.01,
@@ -196,7 +154,23 @@ export const ExpenseJointPage = () => {
         `${rows.length} shared ${rows.length === 1 ? 'item' : 'items'}` +
         (customCount ? ` · ${customCount} custom` : '') +
         (badCount ? ` · ${badCount} not 100%` : '');
-    const jointTotalRoundedExpenses = jointTotalRounded(calcExpenses, NO_REFS, STEP_CENTS);
+
+    // Donut segments are derived from the current rows (one per expense + the rounding buffer).
+    const segments: DonutSegment[] = rows.map((r, i) => ({
+        key: r.id,
+        label: r.name,
+        value: valueOf(r),
+        color: colors[r.id] ?? CHART_PALETTE[i % CHART_PALETTE.length],
+    }));
+    const roundingBuffer = monthlyTotal - jointTotal(calcExpenses, NO_REFS);
+    if (roundingBuffer > 0) {
+        segments.push({
+            key: 'rounding-buffer',
+            label: 'Rounding buffer',
+            value: roundingBuffer,
+            color: colors['rounding-buffer'] ?? REMAINDER_COLOR,
+        });
+    }
 
     return (
         <>
@@ -212,43 +186,71 @@ export const ExpenseJointPage = () => {
                 <div className={styles.cards}>
                     <KpiCard
                         label="Monthly expenses"
-                        value={formatEUR(jointTotalRoundedExpenses)}
-                        sub={`${rows.length} items`}
+                        value={formatEUR(monthlyTotal)}
+                        sub={`Rounded from ${formatEUR(jointTotal(calcExpenses, NO_REFS))}`}
                     />
 
                     <KpiCard
                         label="Yearly expenses"
-                        value={formatEUR(jointTotalRoundedExpenses * 12)}
-                        sub="Monthly × 12"
+                        value={formatEUR(monthlyTotal * 12)}
+                        sub="Rounded × 12"
                     />
 
-                    {people.map((person) => (
-                        <KpiCard
-                            label={`${person.name} pays`}
-                            value={formatEUR(
-                                sliceRounded(
+                    <KpiCard
+                        label="Share of income"
+                        value={formatPct(
+                            combinedIncome ? (monthlyTotal / combinedIncome) * 100 : NaN,
+                        )}
+                        sub={`of ${formatEUR(combinedIncome)} combined monthly income`}
+                    />
+
+                    <KpiCard
+                        label="Left after expenses"
+                        value={formatEUR(combinedIncome - monthlyTotal)}
+                        sub="Combined income minus joint expenses"
+                    />
+                </div>
+
+                {people.length > 0 && (
+                    <div className={styles.whoPays}>
+                        <Label>Who pays</Label>
+
+                        <div
+                            className={styles.payers}
+                            style={{
+                                gridTemplateColumns: `repeat(${Math.min(4, people.length)}, minmax(0, 1fr))`,
+                            }}
+                        >
+                            {people.map((person) => {
+                                const slice = sliceRounded(
                                     calcExpenses,
                                     person.id,
                                     NO_REFS,
                                     rounded[person.id] ?? 0,
                                     STEP_CENTS,
-                                ),
-                            )}
-                            sub="Rounded slice per month"
-                        />
-                    ))}
-                </div>
+                                );
+                                return (
+                                    <KpiCard
+                                        key={person.id}
+                                        label={`${person.name} pays`}
+                                        value={formatEUR(slice)}
+                                        pill={formatPct(
+                                            monthlyTotal ? (slice / monthlyTotal) * 100 : NaN,
+                                        )}
+                                        sub="Rounded slice per month · of joint total"
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 <Panel kicker="Where the joint money goes" title="Joint spread">
                     <DonutChart
-                        segments={donutChartSegments}
-                        centerValue={formatEUR(jointTotalRoundedExpenses)}
+                        segments={segments}
+                        centerValue={formatEUR(monthlyTotal)}
                         centerLabel="Combined / month"
-                        onColorChange={(key, color) =>
-                            setDonutChartSegments((ss) =>
-                                ss.map((s) => (s.key === key ? { ...s, color } : s)),
-                            )
-                        }
+                        onColorChange={(key, color) => setColors((c) => ({ ...c, [key]: color }))}
                     />
                 </Panel>
 
@@ -331,41 +333,16 @@ export const ExpenseJointPage = () => {
 
                                         {people.map((p) => {
                                             const pct = pctOf(r, p.id);
-                                            const share = (valueOf(r) * pct) / 100;
                                             return (
                                                 <Td key={p.id} numeric>
-                                                    {editing && r.split ? (
-                                                        <div className={styles.splitEdit}>
-                                                            <div className={styles.pctWrap}>
-                                                                <Input
-                                                                    numeric
-                                                                    value={String(pct)}
-                                                                    aria-label={`${p.name || 'Person'} split %`}
-                                                                    onChange={(e) =>
-                                                                        setSplit(
-                                                                            r.id,
-                                                                            p.id,
-                                                                            Number(
-                                                                                e.target.value,
-                                                                            ) || 0,
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <span className={styles.splitSub}>
-                                                                {formatEUR(share)}
-                                                            </span>
-                                                        </div>
-                                                    ) : (
-                                                        <span
-                                                            className={cx(
-                                                                styles.readText,
-                                                                !r.split && styles.muted,
-                                                            )}
-                                                        >
-                                                            {formatEUR(share)} · ({pct}%)
-                                                        </span>
-                                                    )}
+                                                    <SplitCell
+                                                        editing={editing}
+                                                        custom={!!r.split}
+                                                        pct={pct}
+                                                        share={(valueOf(r) * pct) / 100}
+                                                        label={`${p.name || 'Person'} split %`}
+                                                        onChange={(next) => setSplit(r, p.id, next)}
+                                                    />
                                                 </Td>
                                             );
                                         })}
@@ -374,7 +351,7 @@ export const ExpenseJointPage = () => {
                                             {editing ? (
                                                 <Checkbox
                                                     checked={!!r.split}
-                                                    onChange={() => toggleCustom(r.id)}
+                                                    onChange={() => toggleCustom(r)}
                                                     label="Custom split"
                                                 />
                                             ) : r.split ? (
@@ -401,52 +378,28 @@ export const ExpenseJointPage = () => {
                         </tbody>
 
                         <tfoot>
-                            <tr>
-                                <Td>Total</Td>
-
-                                <Td numeric>{formatEUR(jointTotal(calcExpenses, NO_REFS))}</Td>
-
-                                {people.map((p) => (
-                                    <Td key={p.id} numeric>
-                                        {formatEUR(
-                                            sliceActual(
-                                                calcExpenses,
-                                                p.id,
-                                                NO_REFS,
-                                                actual[p.id] ?? 0,
-                                            ),
-                                        )}
-                                    </Td>
-                                ))}
-
-                                <Td />
-
-                                <Td aria-hidden />
-                            </tr>
-
-                            <tr>
-                                <Td>Total rounded</Td>
-
-                                <Td numeric>{formatEUR(jointTotalRoundedExpenses)}</Td>
-
-                                {people.map((p) => (
-                                    <Td key={p.id} numeric>
-                                        {formatEUR(
-                                            sliceRounded(
-                                                calcExpenses,
-                                                p.id,
-                                                NO_REFS,
-                                                rounded[p.id] ?? 0,
-                                                STEP_CENTS,
-                                            ),
-                                        )}
-                                    </Td>
-                                ))}
-
-                                <Td />
-
-                                <Td aria-hidden />
-                            </tr>
+                            <TotalsRow
+                                label="Total"
+                                total={jointTotal(calcExpenses, NO_REFS)}
+                                people={people}
+                                sliceFor={(pid) =>
+                                    sliceActual(calcExpenses, pid, NO_REFS, actual[pid] ?? 0)
+                                }
+                            />
+                            <TotalsRow
+                                label="Total rounded"
+                                total={monthlyTotal}
+                                people={people}
+                                sliceFor={(pid) =>
+                                    sliceRounded(
+                                        calcExpenses,
+                                        pid,
+                                        NO_REFS,
+                                        rounded[pid] ?? 0,
+                                        STEP_CENTS,
+                                    )
+                                }
+                            />
                         </tfoot>
                     </Table>
                 </Panel>
