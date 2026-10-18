@@ -1,28 +1,19 @@
 import type { PGlite } from '@electric-sql/pglite';
 import { type Amount, isRef } from '../../shared/amount';
 import type { JointExpense, JointExpenseBody } from '../types';
-
-interface Row {
-    id: string;
-    name: string;
-    amountCents: number | null;
-    amountRef: string | null;
-}
+import { ExpenseRow, rowToAmount } from './expense.repo-shared.ts';
 
 const SELECT = `SELECT id, name, amount_cents AS "amountCents", amount_ref AS "amountRef" FROM joint_expense`;
 
 const amountToColumns = (amount: Amount): { cents: number | null; ref: string | null } =>
     isRef(amount) ? { cents: null, ref: amount.ref } : { cents: Math.round(amount), ref: null };
 
-const rowToAmount = (r: Row): Amount =>
-    r.amountRef != null ? { ref: r.amountRef } : (r.amountCents ?? 0);
-
 /** Database access for joint (shared) expenses and their per-person splits. */
 export class JointExpenseRepo {
     constructor(private readonly db: PGlite) {}
 
     async list(): Promise<JointExpense[]> {
-        const { rows } = await this.db.query<Row>(`${SELECT} ORDER BY created_at`);
+        const { rows } = await this.db.query<ExpenseRow>(`${SELECT} ORDER BY created_at`);
         const splits = await this.allSplits();
 
         return rows.map((r) => ({
@@ -96,7 +87,7 @@ export class JointExpenseRepo {
     }
 
     private async get(id: string): Promise<JointExpense | null> {
-        const { rows } = await this.db.query<Row>(`${SELECT} WHERE id = $1`, [id]);
+        const { rows } = await this.db.query<ExpenseRow>(`${SELECT} WHERE id = $1`, [id]);
         const row = rows[0];
 
         if (!row) {

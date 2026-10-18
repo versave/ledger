@@ -36,4 +36,4 @@ export interface NewPerson {
 export type PersonPatch = NewPerson;
 
 // Joint expense contract types live in shared/ (used by both the API and the client).
-export type { JointExpense, JointExpenseBody } from '../shared/joint-expense';
+export type { JointExpense, JointExpenseBody } from '../shared/expense';

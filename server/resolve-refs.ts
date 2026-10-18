@@ -1,7 +1,7 @@
 import { type Amount, isRef } from '../shared/amount';
-import { parseRef, resolveRef, type RefSources, type RefValue } from '../shared/ref';
+import { parseRef, type RefValue, Ref } from '../shared/ref';
 import { incomeShares, sliceActual, sliceRounded, type JointExpenseCalc } from '../shared/calc';
-import type { ResolvedAmount } from '../shared/joint-expense';
+import type { ResolvedAmount } from '../shared/expense';
 import type { Income, JointExpense, Person } from './types';
 
 const STEP_CENTS = 1000; // round the joint total up to the nearest €10
@@ -53,12 +53,12 @@ export function makeRefResolver(data: ResolverData) {
 
     const shares = incomeShares(incomeByPerson, PCT_STEP);
 
-    const sources: RefSources = {
-        income: (incomeId) => {
+    const sources = {
+        income: (incomeId: string) => {
             const inc = data.incomes.find((i) => i.id === incomeId);
             return { id: incomeId, name: inc?.name ?? '—', value: inc?.amountMonth ?? NaN };
         },
-        jointExpense: (personId, rounded) => {
+        jointExpense: (personId: string, rounded: boolean) => {
             const person = data.people.find((p) => p.id === personId);
             const value = rounded
                 ? sliceRounded(
@@ -69,8 +69,18 @@ export function makeRefResolver(data: ResolverData) {
                       STEP_CENTS,
                   )
                 : sliceActual(calcExpenses, personId, leafResolve, shares.actual[personId] ?? 0);
+
             return { id: personId, name: person ? `${person.name} · slice` : '—', value };
         },
+    };
+
+    const resolveRef = (ref: Ref): RefValue => {
+        switch (ref.kind) {
+            case 'income':
+                return sources.income(ref.incomeId);
+            case 'jointExpense':
+                return sources.jointExpense(ref.personId, ref.rounded);
+        }
     };
 
     const resolveAmount = (amount: Amount): ResolvedAmount => {
@@ -79,8 +89,9 @@ export function makeRefResolver(data: ResolverData) {
         }
 
         const parsed = parseRef(amount.ref);
+
         const value: RefValue = parsed
-            ? resolveRef(parsed, sources)
+            ? resolveRef(parsed)
             : { id: amount.ref, name: '—', value: NaN };
 
         return { ref: amount.ref, ...value };

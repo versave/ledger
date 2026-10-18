@@ -1,9 +1,5 @@
 import { http } from './http';
-import type {
-    JointExpenseBody,
-    ResolvedAmount,
-    ResolvedJointExpense,
-} from '../../shared/joint-expense';
+import type { JointExpenseBody, ResolvedAmount, ResolvedJointExpense } from '../../shared/expense';
 
 // Re-export the shared contract so UI code can import it from the service.
 export type { JointExpenseBody, ResolvedJointExpense };

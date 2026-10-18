@@ -23,16 +23,6 @@ export const ref = {
     }),
 };
 
-/** Serialize a ref to its stored string form. */
-export const formatRef = (ref: Ref): string => {
-    switch (ref.kind) {
-        case 'income':
-            return `income:${ref.incomeId}`;
-        case 'jointExpense':
-            return `jointExpense:${ref.personId}:${ref.rounded ? 'rounded' : 'absolute'}`;
-    }
-};
-
 /** Parse a stored string back to a typed ref, or null if it is unknown/malformed. */
 export const parseRef = (refString: string): Ref | null => {
     const [kind, partA, partB] = refString.split(':');
@@ -40,10 +30,11 @@ export const parseRef = (refString: string): Ref | null => {
     switch (kind) {
         case 'income':
             return partA ? { kind: 'income', incomeId: partA } : null;
-        case 'jointExpense':
+        case 'jointExpense': {
             return partA && (partB === 'rounded' || partB === 'absolute')
                 ? { kind: 'jointExpense', personId: partA, rounded: partB === 'rounded' }
                 : null;
+        }
         default:
             return null;
     }
@@ -51,19 +42,3 @@ export const parseRef = (refString: string): Ref | null => {
 
 /** True when a stored string is one of the recognised ref formats. */
 export const isValidRef = (s: string): boolean => parseRef(s) !== null;
-
-/** Pluggable sources that turn each ref kind into a RefValue (wired to data + calc later). */
-export interface RefSources {
-    income: (incomeId: string) => RefValue;
-    jointExpense: (personId: string, rounded: boolean) => RefValue;
-}
-
-/** Resolve a typed ref to { id, name, value }. The switch is exhaustive by `kind`. */
-export const resolveRef = (ref: Ref, sources: RefSources): RefValue => {
-    switch (ref.kind) {
-        case 'income':
-            return sources.income(ref.incomeId);
-        case 'jointExpense':
-            return sources.jointExpense(ref.personId, ref.rounded);
-    }
-};

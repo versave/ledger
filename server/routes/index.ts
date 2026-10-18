@@ -4,6 +4,7 @@ import { incomeRoutes } from './income.routes';
 import { peopleRoutes } from './people.routes';
 import { jointExpenseRoutes } from './joint-expense.routes';
 import { exportRoutes } from './export.routes';
+import { expenseRoutes } from './expense.routes.ts';
 
 /** Build the API: mount each domain's routes and a shared error handler. */
 export function createApp(repos: Repos): Hono {
@@ -11,6 +12,7 @@ export function createApp(repos: Repos): Hono {
 
     app.route('/income', incomeRoutes(repos.income));
     app.route('/people', peopleRoutes(repos.people));
+    app.route('/expenses', expenseRoutes(repos));
     app.route('/joint-expenses', jointExpenseRoutes(repos));
     app.route('/export', exportRoutes(repos.backup));
 

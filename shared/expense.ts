@@ -4,29 +4,31 @@ import type { RefValue } from './ref';
 /** In API responses a ref amount is resolved to its value, keeping `ref` so it round-trips on save. */
 export type ResolvedAmount = number | ({ ref: string } & RefValue);
 
-/** A joint expense as returned by the API, with any ref amount resolved to { ref, id, name, value }. */
-export interface ResolvedJointExpense {
+export interface ResolvedExpense {
     id: string;
     name: string;
     amount: ResolvedAmount;
+}
+
+export interface ResolvedJointExpense extends ResolvedExpense {
     split: Record<string, number> | null;
 }
 
-/** A joint (shared) expense, as returned by the API (GET / POST / PATCH responses). */
-export interface JointExpense {
+export interface Expense {
     id: string;
     name: string;
     amount: Amount; // literal cents, or { ref }
-    /** Custom per-person split (personId -> percent), or null for the default share. */
+}
+
+export interface JointExpense extends Expense {
     split: Record<string, number> | null;
 }
 
-/**
- * Request body for POST (create) and PATCH (update) /joint-expenses.
- * All fields optional: PATCH updates only what is sent; `split: null` clears a custom split.
- */
-export interface JointExpenseBody {
+export interface ExpenseBody {
     name?: string;
     amount?: Amount;
+}
+
+export interface JointExpenseBody extends ExpenseBody {
     split?: Record<string, number> | null;
 }

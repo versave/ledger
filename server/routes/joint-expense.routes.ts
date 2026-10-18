@@ -1,25 +1,8 @@
 import { Hono } from 'hono';
 import type { Repos } from '../repos';
-import { type Amount, isRef } from '../../shared/amount';
-import { isValidRef } from '../../shared/ref';
-import type {
-    JointExpense,
-    JointExpenseBody,
-    ResolvedJointExpense,
-} from '../../shared/joint-expense';
+import type { JointExpense, JointExpenseBody, ResolvedJointExpense } from '../../shared/expense';
 import { makeRefResolver } from '../resolve-refs';
-
-function parseAmount(v: unknown): Amount | undefined {
-    if (typeof v === 'number') {
-        return v;
-    }
-
-    if (v && typeof v === 'object' && typeof (v as { ref?: unknown }).ref === 'string') {
-        return { ref: (v as { ref: string }).ref };
-    }
-
-    return undefined;
-}
+import { loadData, parseAmount, refFormatError } from './expense-shared.routes.ts';
 
 function parseSplit(v: unknown): Record<string, number> | null {
     if (!v || typeof v !== 'object') {
@@ -35,33 +18,14 @@ function parseSplit(v: unknown): Record<string, number> | null {
     return out;
 }
 
-/** 400 message when an amount is a ref whose format isn't recognised, else null. */
-function refFormatError(amount: Amount | undefined): string | null {
-    if (amount !== undefined && isRef(amount) && !isValidRef(amount.ref)) {
-        return `unknown ref format: '${amount.ref}'`;
-    }
-
-    return null;
-}
-
 /** Routes for joint (shared) expenses, mounted under /joint-expenses. Responses resolve ref amounts. */
 export function jointExpenseRoutes(repos: Repos): Hono {
     const routes = new Hono();
     const repo = repos.jointExpense;
 
-    // Load the snapshot the resolver needs (incomes + people drive slices; joint expenses feed the pool).
-    const loadData = async () => {
-        const [incomes, people, jointExpenses] = await Promise.all([
-            repos.income.list(),
-            repos.people.list(),
-            repo.list(),
-        ]);
-        return { incomes, people, jointExpenses };
-    };
-
     // GET /joint-expenses  ->  ResolvedJointExpense[]
     routes.get('/', async (ctx) => {
-        const data = await loadData();
+        const data = await loadData(repos);
         const { resolveAmount } = makeRefResolver(data);
         const resolved: ResolvedJointExpense[] = data.jointExpenses.map((je) => ({
             ...je,
@@ -86,7 +50,7 @@ export function jointExpenseRoutes(repos: Repos): Hono {
             amount,
             split: body.split === undefined ? undefined : parseSplit(body.split),
         });
-        const { resolveAmount } = makeRefResolver(await loadData());
+        const { resolveAmount } = makeRefResolver(await loadData(repos));
 
         return ctx.json({ ...expense, amount: resolveAmount(expense.amount) }, 201);
     });
@@ -121,7 +85,7 @@ export function jointExpenseRoutes(repos: Repos): Hono {
             return c.json({ error: 'not found' }, 404);
         }
 
-        const { resolveAmount } = makeRefResolver(await loadData());
+        const { resolveAmount } = makeRefResolver(await loadData(repos));
 
         return c.json({ ...expense, amount: resolveAmount(expense.amount) });
     });
