@@ -1,27 +1,30 @@
-import { useState } from 'react'
-import { EditToggle, EmptyState } from '../../components'
-import PageHeader from '../../layout/PageHeader/PageHeader'
-import type { PageDef } from '../../navigation.tsx'
+import { useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { EditToggle, EmptyState } from '../../components';
+import PageHeader from '../../layout/PageHeader/PageHeader';
 
-export default function Placeholder({ page }: { page: PageDef }) {
-    const [editing, setEditing] = useState(false)
+interface Props {
+    title: string;
+    desc: string;
+    icon: LucideIcon;
+    editable?: boolean;
+}
+
+export default function Placeholder({ title, desc, icon, editable = false }: Props) {
+    const [editing, setEditing] = useState(false);
 
     return (
         <>
             <PageHeader
-                title={page.title}
-                desc={page.desc}
+                title={title}
+                desc={desc}
                 actions={
-                    page.editable && (
+                    editable && (
                         <EditToggle editing={editing} onToggle={() => setEditing(!editing)} />
                     )
                 }
             />
-            <EmptyState
-                icon={page.icon}
-                title="Coming soon"
-                text="This page hasn't been built yet."
-            />
+            <EmptyState icon={icon} title="Coming soon" text="This page hasn't been built yet." />
         </>
-    )
+    );
 }

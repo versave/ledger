@@ -1,10 +1,26 @@
-import { Link2, Palette } from 'lucide-react';
+import {
+    ArrowLeftRight,
+    CreditCard,
+    Landmark,
+    Link2,
+    type LucideIcon,
+    Palette,
+    User,
+    Users,
+    UsersRound,
+} from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { PAGES } from '../../navigation.tsx';
 import { cx } from '../../utils/cx';
 import styles from './Sidebar.module.scss';
 import { IncomePagesNavLinks } from '../IncomePagesNavLinks/IncomePagesNavLinks.tsx';
 import { ExpensePagesNavLinks } from '../ExpensePagesNavLinks/ExpensePagesNavLinks.tsx';
+
+const NavItem = ({ to, icon: Icon, label }: { to: string; icon: LucideIcon; label: string }) => (
+    <NavLink to={to} className={({ isActive }) => cx(styles.navItem, isActive && styles.active)}>
+        <Icon size={18} strokeWidth={1.5} />
+        <span>{label}</span>
+    </NavLink>
+);
 
 export default function Sidebar() {
     return (
@@ -15,29 +31,21 @@ export default function Sidebar() {
             </div>
 
             <nav className={styles.nav}>
-                {PAGES.map(({ path, label, icon: Icon }) => {
-                    switch (path) {
-                        case '/income': {
-                            return <IncomePagesNavLinks key={path} />;
-                        }
-                        case '/expense': {
-                            return <ExpensePagesNavLinks key={path} />;
-                        }
-                        default:
-                            return (
-                                <NavLink
-                                    key={path}
-                                    to={path}
-                                    className={({ isActive }) =>
-                                        cx(styles.navItem, isActive && styles.active)
-                                    }
-                                >
-                                    <Icon size={18} strokeWidth={1.5} />
-                                    <span>{label}</span>
-                                </NavLink>
-                            );
-                    }
-                })}
+                <NavItem to="/people" icon={UsersRound} label="People" />
+
+                <IncomePagesNavLinks />
+
+                <ExpensePagesNavLinks />
+
+                <NavItem to="/personal" icon={User} label="Personal spread" />
+
+                <NavItem to="/joint" icon={Users} label="Joint spread" />
+
+                <NavItem to="/debt" icon={CreditCard} label="Debt" />
+
+                <NavItem to="/transfers" icon={ArrowLeftRight} label="Monthly transfers" />
+
+                <NavItem to="/nwr" icon={Landmark} label="Net worth review" />
             </nav>
 
             <div className={styles.foot}>
