@@ -10,7 +10,7 @@ export interface JointExpenseCalc {
 
 type Resolve = (ref: string) => number;
 
-const sum = (ns: number[]): number => ns.reduce((s, n) => s + n, 0);
+export const sum = (ns: number[]): number => ns.reduce((s, n) => s + n, 0);
 
 /** Sum of every joint expense (resolved to cents). */
 export const jointTotal = (expenses: JointExpenseCalc[], resolve: Resolve): number =>
