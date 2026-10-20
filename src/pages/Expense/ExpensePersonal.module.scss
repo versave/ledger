@@ -1,0 +1,20 @@
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+}
+
+.nameCell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+// Read-mode text aligns with the 8px inset of the inline inputs it replaces.
+.readText {
+    padding: 0 8px;
+}
+
+.muted {
+    color: var(--text-muted);
+}
